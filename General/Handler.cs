@@ -55,8 +55,55 @@ namespace PGN.General
 
         public static void OnLogReceived(string text)
         {
-            onLogReceived("PGN LOG: " + text);
+            onLogReceived?.Invoke("PGN LOG: " + text);
         }
 
+        public static string GetLocalIpAddress()
+        {
+            System.Net.NetworkInformation.UnicastIPAddressInformation mostSuitableIp = null;
+
+            var networkInterfaces = System.Net.NetworkInformation.NetworkInterface.GetAllNetworkInterfaces();
+
+            foreach (var network in networkInterfaces)
+            {
+                if (network.OperationalStatus != System.Net.NetworkInformation.OperationalStatus.Up)
+                    continue;
+
+                var properties = network.GetIPProperties();
+
+                if (properties.GatewayAddresses.Count == 0)
+                    continue;
+
+                foreach (var address in properties.UnicastAddresses)
+                {
+                    if (address.Address.AddressFamily != AddressFamily.InterNetwork)
+                        continue;
+
+                    if (IPAddress.IsLoopback(address.Address))
+                        continue;
+
+                    if (!address.IsDnsEligible)
+                    {
+                        if (mostSuitableIp == null)
+                            mostSuitableIp = address;
+                        continue;
+                    }
+
+                    // The best IP is the IP got from DHCP server
+                    if (address.PrefixOrigin != System.Net.NetworkInformation.PrefixOrigin.Dhcp)
+                    {
+                        if (mostSuitableIp == null || !mostSuitableIp.IsDnsEligible)
+                            mostSuitableIp = address;
+                        continue;
+                    }
+
+                    return address.Address.ToString();
+                }
+            }
+
+            return mostSuitableIp != null
+                ? mostSuitableIp.Address.ToString()
+                : "";
+        }
     }
 }

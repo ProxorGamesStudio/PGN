@@ -1,0 +1,27 @@
+C:\Users\Dmitry\source\repos\ServerTest\PGN\obj\Debug\netstandard2.0\PGN.csprojAssemblyReference.cache
+C:\Users\Dmitry\source\repos\ServerTest\PGN\obj\Debug\netstandard2.0\PGN.csproj.CoreCompileInputs.cache
+C:\Users\Dmitry\source\repos\ServerTest\PGN\obj\Debug\netstandard2.0\PGN.AssemblyInfoInputs.cache
+C:\Users\Dmitry\source\repos\ServerTest\PGN\obj\Debug\netstandard2.0\PGN.AssemblyInfo.cs
+C:\Users\Dmitry\source\repos\ServerTest\PGN\bin\Debug\netstandard2.0\PGN.deps.json
+C:\Users\Dmitry\source\repos\ServerTest\PGN\bin\Debug\netstandard2.0\PGN.dll
+C:\Users\Dmitry\source\repos\ServerTest\PGN\bin\Debug\netstandard2.0\PGN.pdb
+C:\Users\Dmitry\source\repos\ServerTest\PGN\obj\Debug\netstandard2.0\PGN.dll
+C:\Users\Dmitry\source\repos\ServerTest\PGN\obj\Debug\netstandard2.0\PGN.pdb
+D:\Own Projects\PGN\PGN\Server\PGN\bin\Debug\netstandard2.0\PGN.deps.json
+D:\Own Projects\PGN\PGN\Server\PGN\bin\Debug\netstandard2.0\PGN.dll
+D:\Own Projects\PGN\PGN\Server\PGN\bin\Debug\netstandard2.0\PGN.pdb
+D:\Own Projects\PGN\PGN\Server\PGN\obj\Debug\netstandard2.0\PGN.csproj.CoreCompileInputs.cache
+D:\Own Projects\PGN\PGN\Server\PGN\obj\Debug\netstandard2.0\PGN.AssemblyInfoInputs.cache
+D:\Own Projects\PGN\PGN\Server\PGN\obj\Debug\netstandard2.0\PGN.AssemblyInfo.cs
+D:\Own Projects\PGN\PGN\Server\PGN\obj\Debug\netstandard2.0\PGN.dll
+D:\Own Projects\PGN\PGN\Server\PGN\obj\Debug\netstandard2.0\PGN.pdb
+D:\Own Projects\PGN\PGN\Server\PGN\obj\Debug\netstandard2.0\PGN.csprojAssemblyReference.cache
+C:\Users\wenba\Documents\Projects\Proxor Games Network\PGN\PGN\Server\PGN\bin\Debug\netstandard2.0\PGN.deps.json
+C:\Users\wenba\Documents\Projects\Proxor Games Network\PGN\PGN\Server\PGN\bin\Debug\netstandard2.0\PGN.dll
+C:\Users\wenba\Documents\Projects\Proxor Games Network\PGN\PGN\Server\PGN\bin\Debug\netstandard2.0\PGN.pdb
+C:\Users\wenba\Documents\Projects\Proxor Games Network\PGN\PGN\Server\PGN\obj\Debug\netstandard2.0\PGN.csprojAssemblyReference.cache
+C:\Users\wenba\Documents\Projects\Proxor Games Network\PGN\PGN\Server\PGN\obj\Debug\netstandard2.0\PGN.csproj.CoreCompileInputs.cache
+C:\Users\wenba\Documents\Projects\Proxor Games Network\PGN\PGN\Server\PGN\obj\Debug\netstandard2.0\PGN.AssemblyInfoInputs.cache
+C:\Users\wenba\Documents\Projects\Proxor Games Network\PGN\PGN\Server\PGN\obj\Debug\netstandard2.0\PGN.AssemblyInfo.cs
+C:\Users\wenba\Documents\Projects\Proxor Games Network\PGN\PGN\Server\PGN\obj\Debug\netstandard2.0\PGN.dll
+C:\Users\wenba\Documents\Projects\Proxor Games Network\PGN\PGN\Server\PGN\obj\Debug\netstandard2.0\PGN.pdb

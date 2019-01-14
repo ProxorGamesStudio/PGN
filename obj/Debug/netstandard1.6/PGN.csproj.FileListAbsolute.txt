@@ -1,0 +1,4 @@
+D:\Own Projects\PGN\PGN\Server\PGN\obj\Debug\netstandard1.6\PGN.csprojAssemblyReference.cache
+D:\Own Projects\PGN\PGN\Server\PGN\obj\Debug\netstandard1.6\PGN.csproj.CoreCompileInputs.cache
+D:\Own Projects\PGN\PGN\Server\PGN\obj\Debug\netstandard1.6\PGN.AssemblyInfoInputs.cache
+D:\Own Projects\PGN\PGN\Server\PGN\obj\Debug\netstandard1.6\PGN.AssemblyInfo.cs

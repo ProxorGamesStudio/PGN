@@ -26,20 +26,40 @@ namespace PGN.Data
 
         public object data;
 
+        public ulong number { get; private set; }
+
+        public void SetNumber(ulong number)
+        {
+            this.number = number;
+        }
 
         public static byte[] GetBytesData(NetData message)
         {
-            using (var memoryStream = new MemoryStream())
+            try
             {
-                (new BinaryFormatter()).Serialize(memoryStream, message);
-                  return Compress(memoryStream.ToArray());
-            }  
+                using (var memoryStream = new MemoryStream())
+                {
+                    (new BinaryFormatter()).Serialize(memoryStream, message);
+                    return memoryStream.ToArray();
+                }
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public static NetData RecoverBytes(byte[] bytesData)
         {
-            using (var memoryStream = new MemoryStream(Decompress(bytesData)))
-                return (new BinaryFormatter()).Deserialize(memoryStream) as NetData;
+            try
+            {
+                using (var memoryStream = new MemoryStream(bytesData))
+                    return (new BinaryFormatter()).Deserialize(memoryStream) as NetData;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public static byte[] Compress(byte[] data)

@@ -9,12 +9,24 @@ namespace PGN.General
     [Serializable]
     public class User
     {     
-        public string ID;
-        public string name;
+        public string ID = string.Empty;
+        public string name = string.Empty;
 
         public User()
         {
-            ID = Dns.GetHostName() + "@" + DateTime.Now.ToString(); 
+            name = Dns.GetHostName();
+            ID = name; 
+        }
+
+        public User(string id)
+        {
+            this.name = Dns.GetHostName();
+            this.ID = id;
+        }
+
+        public override string ToString()
+        {
+            return "\nID: " + ID; 
         }
     }
 }

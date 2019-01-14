@@ -8,149 +8,168 @@ using System.Text;
 using System.Threading;
 
 using PGN.Data;
+using PGN.General.Connections;
 
 namespace PGN.General
 {
     public class ServerHandler : Handler
     {
-
-        private static ManualResetEvent allDoneTCP = new ManualResetEvent(false);
-        private static ManualResetEvent allDoneUDP = new ManualResetEvent(false);
-
         private static TcpListener tcpListener;
         private static UdpClient udpListener;
 
-        private Hashtable clients = new Hashtable();
+        public static Hashtable clients { get; private set; } = new Hashtable();
 
-        protected internal void AddConnection(NetUser client)
+        //DATABASE FUNCTIONS
+        public static Func<User, object> createUserBD;
+        public static Func<string, object> getInfoFromBD;
+
+        protected internal static void AddConnection(NetUser client)
         {
-            clients.Add(client.adress, client);
+            clients.Add(client.user.ID, client);
         }
-        protected internal void RemoveConnection(NetUser user)
+
+        protected internal static void RemoveConnection(NetUser client)
         {
-            if (clients.Contains(user.adress))
-                clients.Remove(user.adress);
+            if (clients.Contains(client.user.ID))
+                clients.Remove(client.user.ID);
+        }
+
+        protected internal static void RemoveConnection(string id)
+        {
+            if (clients.Contains(id))
+                clients.Remove(id);
         }
 
         public void Start()
         {
             tcpListener = new TcpListener(localAddressTCP);
             udpListener = new UdpClient(localAddressUDP);
+            udpListener.EnableBroadcast = true;
+            udpListener.Client.ReceiveBufferSize = 100000;
+
             tcpListener.Start();
             OnLogReceived("Server was created.");
+
+            NetUser.server = this;
+
+            ListenTCP();
+            ListenUDP();
         }
 
-        public void ListenTCP()
+        private void ListenTCP()
         {
             try
             {
-                allDoneTCP.Reset();
                 tcpListener.BeginAcceptTcpClient(new AsyncCallback(AcceptCallback), tcpListener);
-                allDoneTCP.WaitOne();
             }
+
             catch (Exception ex)
             {
                 OnLogReceived(ex.ToString());
-                Stop();
             }
         }
 
-        public void ListenUDP()
+        private void ListenUDP()
         {
             try
             {
-                allDoneUDP.Reset();
                 udpListener.BeginReceive(ReceiveCallback, udpListener);
-                allDoneUDP.WaitOne();
             }
             catch (Exception ex)
             {
-
+               OnLogReceived(ex.ToString());
             }
         }
 
         protected internal void AcceptCallback(IAsyncResult ar)
         {
-            allDoneTCP.Set();
-
-            TcpClient tcpClient = (ar.AsyncState as TcpListener).EndAcceptTcpClient(ar);
-            NetUser client = null;
-            if (clients.Contains((tcpClient.Client.RemoteEndPoint as IPEndPoint).Address))
-            {
-                client = clients[(tcpClient.Client.RemoteEndPoint as IPEndPoint).Address] as NetUser;
-                client.tcpClient = tcpClient;
-            }
-            else
-                client = new NetUser(tcpClient, this, (tcpClient.Client.RemoteEndPoint as IPEndPoint).Address);
-
-            client.RecieveTCP();
+            ListenTCP();
+            TcpClient tcpClient = tcpListener.EndAcceptTcpClient(ar);
+            TcpConnection tcpConnection = new TcpConnection(tcpClient, tcpClient.Client.RemoteEndPoint as IPEndPoint);
+            tcpConnection.Recieve();
         }
 
         protected internal void ReceiveCallback(IAsyncResult ar)
         {
-            allDoneUDP.Set();
-
-            byte[] bytes = new byte[1024];
+            byte[] bytes = new byte[2048];
 
             IPEndPoint iPEndPoint = new IPEndPoint(IPAddress.Any, 8001);
 
+            UdpClient udpClient = (ar.AsyncState as UdpClient);
+
             try
             {
-                do
-                {
-                    bytes = udpListener.EndReceive(ar, ref iPEndPoint);
-                }
-                while ((ar.AsyncState as UdpClient).Available > 0);
-               
-                NetUser client = null;
-                if (clients.Contains(iPEndPoint.Address))
-                {
-                    client = clients[iPEndPoint.Address] as NetUser;
-                    client.udpClient = udpListener;
-                }
-                else
-                    client = new NetUser(udpListener, this, iPEndPoint.Address);
+                bytes = udpClient.EndReceive(ar, ref iPEndPoint);
 
-                client.RecieveUDP(bytes);
+                UdpConnection udpConnection = new UdpConnection(udpClient, iPEndPoint);
+                udpConnection.Recieve(bytes);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
-
+                OnLogReceived(e.Message);
+            }
+            finally
+            {
+                ListenUDP();
             }
         }
 
-        protected internal void testSend(IAsyncResult ar)
+        public void BroadcastMessageTCP(byte[] data, User sender)
         {
-            udpListener.EndSend(ar);
+            if (data != null)
+            {
+                foreach (string key in clients.Keys)
+                {
+                    if ((clients[key] as NetUser).user.ID != sender.ID && (clients[key] as NetUser).tcpConnection != null)
+                        (clients[key] as NetUser).tcpConnection.SendMessage(data);
+                }
+            }
         }
 
-        protected internal void BroadcastMessageTCP(byte[] data, User sender)
+        public void BroadcastMessageUDP(byte[] data, User sender)
         {
-            foreach(IPAddress key in clients.Keys)
-                if((clients[key] as NetUser).user.ID != sender.ID)
-                    (clients[key] as NetUser).stream.Write(data, 0, data.Length);
+            if (data != null)
+            {
+                foreach (string key in clients.Keys)
+                    if ((clients[key] as NetUser).user.ID != sender.ID && (clients[key] as NetUser).udpConnection != null)
+                        (clients[key] as NetUser).udpConnection.SendMessage(data);
+            }
         }
 
-        protected internal void BroadcastMessageUDP(byte[] data, User sender)
+
+        public void SendMessageViaTCP(NetData message, User user)
         {
-            foreach (IPAddress key in clients.Keys)
-                if ((clients[key] as NetUser).user.ID != sender.ID)
-                    (clients[key] as NetUser).udpClient.BeginSend(data, data.Length, new IPEndPoint((clients[key] as NetUser).adress, 8001), testSend, (clients[key] as NetUser).udpClient);
+            (clients[user.ID] as NetUser).tcpConnection.SendMessage(message);
         }
 
-        protected internal void BroadcastMessageCallback(IAsyncResult ar)
+        public void SendMessageViaUDP(NetData message, User user)
         {
-            UdpClient client = ar.AsyncState as UdpClient;
-            client.EndSend(ar);
+            (clients[user.ID] as NetUser).udpConnection.SendMessage(message);
+        }
+
+        public void SendMessageViaTCP(byte[] bytes, User user)
+        {
+            (clients[user.ID] as NetUser).tcpConnection.SendMessage(bytes);
+        }
+
+        public void SendMessageViaUDP(byte[] bytes, User user)
+        {
+            (clients[user.ID] as NetUser).udpConnection.SendMessage(bytes);
+        }
+
+        public object GetUserData(string id)
+        {
+           return getInfoFromBD(id);
         }
 
         public void Stop()
         {
             tcpListener.Stop();
+            udpListener.Close();
 
             for (int i = 0; i < clients.Count; i++)
             {
-                (clients[i] as NetUser).Close();
+                (clients[i] as NetUser).tcpConnection.Close();
             }
             Environment.Exit(0);
         }
